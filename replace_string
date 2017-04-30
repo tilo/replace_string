@@ -1,38 +1,38 @@
-#!/usr/bin/perl5
+#!/usr/bin/perl
 
-$timestamp = "Time-stamp: <Mon, 4 Apr 2011, 18:59:44 PDT  tilo>";
+$timestamp = "Time-stamp: <Fri, 17 Jun 2011, 05:02:45 PDT  tilo>";
 $timestamp =~ s/.+: <(\d+) (\w+) (\d+) ([0-9:]+) (\w+)>/$1 $2 $3  $4  by $5/;
 
 ####################################################################################################
 #
 #  PERL program for query search replace of strings in multiple files
 #
-#  Copyright by Tilo Sloboda,  created 08 June 94 
+#  Copyright by Tilo Sloboda,  created 08 June 94
 #
 #  License:
 #         Freely available under the terms of the OpenSource "Artistic License"
 #         in combination with the Addendum A (below)
-# 
-#         In case you did not get a copy of the license along with the software, 
-#         it is also available at:   http://www.unixgods.org/~tilo/replace_string/ 
 #
-#  Addendum A: 
+#         In case you did not get a copy of the license along with the software,
+#         it is also available at:   http://www.unixgods.org/~tilo/replace_string/
+#
+#  Addendum A:
 #         THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU!
 #         SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
-#         REPAIR OR CORRECTION. 
+#         REPAIR OR CORRECTION.
 #
-#         IN NO EVENT WILL THE COPYRIGHT HOLDERS  BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, 
-#         SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY 
-#         TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED 
-#         INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM 
+#         IN NO EVENT WILL THE COPYRIGHT HOLDERS  BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL,
+#         SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY
+#         TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
+#         INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM
 #         TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF THE COPYRIGHT HOLDERS OR OTHER PARTY HAS BEEN
 #         ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 #
 #
 #  USAGE: run without parameters, or see message in subroutine "show_parameters" below.
 #
-#  NOTE:  this script was written as a quick-fix back in 1994, using perl4, and has "grown" 
-#         since then.. 
+#  NOTE:  this script was written as a quick-fix back in 1994, using perl4, and has "grown"
+#         since then..
 #         I would not consider it to be an example for good perl5 programming style!
 #         In other words: I really need to re-write it sometime
 #
@@ -87,7 +87,7 @@ $timestamp =~ s/.+: <(\d+) (\w+) (\d+) ([0-9:]+) (\w+)>/$1 $2 $3  $4  by $5/;
 # it could handle only one substitution for each line.
 #
 ####################################################################################################
-require "flush.pl";
+## require "flush.pl";
 
 $revision        = '$Revision: 1.10 $';
 $revision        =~ tr/$//d;
@@ -102,7 +102,16 @@ $verbose    = 0;
 $show_rules = 1;
 $paragraph_mode = 0;
 $old_format = 0;
-$delete_empty_lines = 0;        # delete lines which get replaced to nothing? 
+$delete_empty_lines = 0;        # delete lines which get replaced to nothing?
+
+
+sub flush {
+    local($old) = select(shift);
+    $| = 1;
+    print "";
+    $| = 0;
+    select($old);
+}
 
 #---------------------------------------------------------------------------------------------------
 # Usage message:
@@ -123,14 +132,14 @@ $show_rules = 1 if $verbose;
 
 if ($old_format) {
   $search_replace = "s/$oldstr/$newstr/g";
-  
+
   print "
 ============================================================
 
   IMPORTANT:
-  
+
     You used   -o $oldstr -n $newstr   on the commandline
-    The -o and -n options will become obsolete soon. 
+    The -o and -n options will become obsolete soon.
 
     Please use   -s $search_replace   in the future!
 
@@ -221,7 +230,7 @@ if (defined $filelist) {
         $old = splice(@new,$i,1);
         printf(" >>> WARNING: %-26s - omitting \"$old\"\n", $reason);
         next;
-     } 
+     }
      else {
         $i++;
      }
@@ -239,9 +248,9 @@ $file_nr = 0;
 foreach $file (@files) {
   local($temp_touched) = 0;
   local(@stats,$org_mode,$org_uid,$org_gid); ## we need this to keep track of the original file permissions
-  
+
   $file_nr++;
-  
+
   open(FILE,  "< $file")        || die " >>> ERROR: can not open file $file for reading!\n";
   open(NEW,   "> $tempfile")    || die " >>> ERROR: can not open temporary file $tempfile for writing!\n";
 
@@ -252,16 +261,16 @@ foreach $file (@files) {
   $org_uid  = $stats[4];
   $org_gid  = $stats[5];
   @commands = ();               ## commands for copying files (for the -mcf option)
-  
+
   print "\n########################################\n" if $verbose;
   print "file $file_nr: \"$file\"\n";
   print "########################################\n\n" if $verbose;
 
   if ($paragraph_mode) { # multi-line matching and paragraph input mode if requested
-   $/ = "\n\n"; 
-   $* = 1;
-}
-  
+   $/ = "\n\n";
+   print "-----------------------------------------------\n     WARNING: Paragraph Mode may no longer work\n------------------------------------------------\n"
+  }
+
   $line_nr = 1;
   while(<FILE>) {
     local($subs) = 0;
@@ -272,7 +281,7 @@ foreach $file (@files) {
     if(defined $copy_line) {          ## if we defined a regexp with '-d' to copy a line
        print NEW "$line\n";             ## first print the "original" or non-matching line
        $line_nr++;
-       
+
        if (! eval $copy_line) {       ## if we can rename this line (eg. in UTT-files)
           next;                         ## process the next line...
        }
@@ -294,7 +303,7 @@ foreach $file (@files) {
       $subs += eval $search_replace;    # apply this substitution rule
       warn " >>> ERROR:  $@     DURING EVALUATION OF \'$search_replace\'\n\n" if $@;
     }
-    
+
     if ($subs) {
        if ($do_query) {
           printf("line %4d : \"%s\"\n", $line_nr, $line);
@@ -318,7 +327,7 @@ foreach $file (@files) {
        }
     }
     last if $quit;              ## stop processing this file if user typed 'Q'uit
-    
+
     ## omit to print an empty line, if it was replaced to an empty line
     ## but we want to keep empty lines in the original file, if they are un-touched.
 
@@ -326,7 +335,7 @@ foreach $file (@files) {
         print NEW "$line\n" if ((!$subs) || ($line ne ""));
     } else {
         print NEW "$line\n";
-    }    
+    }
     $line_nr++;
   }
   close(FILE);
@@ -353,7 +362,7 @@ print "  processed $file_nr files\n";
 
 ####################################################################################################
 #
-#   S U B R O U T I N E S : 
+#   S U B R O U T I N E S :
 #
 ####################################################################################################
 
@@ -377,7 +386,7 @@ sub y_or_n {
     print STDOUT "$prompt (y/n) ";
     local ($answer) = scalar(<STDIN>);
     chomp $answer;
-    
+
     $/ = "\n\n" if $paragraph_mode;
     return ($answer =~ /^y/i) ;                                  ## returns BOOLEAN
 }
@@ -428,12 +437,12 @@ sub show_parameters
 {
    local($note) = @_;
 
-  print "                                         
+  print "
      Copyright by  Tilo Sloboda <myfirstname . mylastname @ Google Email>
 
      Freely distributable under the terms of the Open Source Artistic License.
      Homepage:   http://www.unixgods.org/~tilo/replace_string/
-     
+
                      created    :   8 Jun 94  by  Tilo Sloboda
                      last edited:  $timestamp
                      revision   :  $revision
@@ -450,10 +459,10 @@ sub show_parameters
                    containing PERL search/replace expressions.
                    This way you can do multiple search/replaces
                    (see the note below).
-       
+
        -f    str   one or more space separarted filenames            ($note: files)
                    this has to be the last option!
-       -F    str   alternatively you can provide a file 
+       -F    str   alternatively you can provide a file
                    containing the list of files to be processed
 
        -v          verbose                                           ($note: quiet)
@@ -463,24 +472,24 @@ sub show_parameters
        -nq         don't query, replace without asking               ($note: query)
 
        -p          paragraph mode (multi-line matching)
-       
+
        -m    str   only replace lines matching the given reg-exp     ($note: all lines)
                    keeps all other lines untouched.
        -nm   str   only replace lines NOT matching the given reg-exp ($note: all lines)
                    keeps all other lines untouched.
-         
+
        -del        delete lines which are empty after replace operations ($note: no)
-          
+
        -d    str   first duplicates lines matching the given         ($note: no)
                    PERL search/replace command (eg.: s/^machine:/LM_line:/ )
                    then applies all given substitutions (by -s -S options)
                    to the new line. (-d has preceedence over -m option)
 
        -mcf        modify filenames and copy files.                  ($note: no)
-                   Each match of reg-exp is considered as a filename 
-                   which is in another directory. Additional to the 
-                   search/replace operation, the referenced file will 
-                   be copied into the same directory as the file which 
+                   Each match of reg-exp is considered as a filename
+                   which is in another directory. Additional to the
+                   search/replace operation, the referenced file will
+                   be copied into the same directory as the file which
                    is referencing it.
 
      NOTES: - The matching is done case-sensitive!
@@ -493,12 +502,12 @@ sub show_parameters
             - UIDs and GIDs are preserved if replace_string is run by ROOT
 
      QUERY-MODE:
-              The user will be asked for every match if it should be replaced 
-              (unless you use the '-nq' option). When asked, the user can answer 
-              'n' for no, 'y' for yes, '!' for all further occurences in this 
-              file, and 'q' for quit processing this file (proceed with the next 
+              The user will be asked for every match if it should be replaced
+              (unless you use the '-nq' option). When asked, the user can answer
+              'n' for no, 'y' for yes, '!' for all further occurences in this
+              file, and 'q' for quit processing this file (proceed with the next
               file).
-              
+
 "
 }
 #===================================================================================================
@@ -510,7 +519,7 @@ sub process_options {
     $arg_error = 0;     # FALSE
 
     while (@ARGV) {
-      
+
       if ($ARGV[0] eq '-o') {
         shift(@ARGV);
         $oldstr = $ARGV[0];

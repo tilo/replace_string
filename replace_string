@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-$timestamp = "Time-stamp: <Fri, 17 Jun 2011, 05:02:45 PDT  tilo>";
-$timestamp =~ s/.+: <(\d+) (\w+) (\d+) ([0-9:]+) (\w+)>/$1 $2 $3  $4  by $5/;
+$timestamp = 'Sun Apr 30 12:27:11 PDT 2017';
+$revision        = '1.11'
 
 ####################################################################################################
 #
@@ -36,63 +36,7 @@ $timestamp =~ s/.+: <(\d+) (\w+) (\d+) ([0-9:]+) (\w+)>/$1 $2 $3  $4  by $5/;
 #         I would not consider it to be an example for good perl5 programming style!
 #         In other words: I really need to re-write it sometime
 #
-#== RCS INFO: =============================================================================
-#
-# $Id: replace_string,v 1.10 2001/05/27 19:35:10 tilo Exp $
-#
-# $Log: replace_string,v $
-# Revision 1.10  2001/05/27 19:35:10  tilo
-# some minor changes. Changed Copyright notice to OpenSource Artistic License
-#
-# Revision 1.9  2000/01/04 02:22:40  tilo
-# added option -del to remove lines, which would be empty after a substitution.
-# default is to NOT delete such lines!
-#
-# Revision 1.8  1996/01/18  19:06:54  sloboda
-# introduced paragraph input mode (option -p)
-#
-# Revision 1.7  1995/05/18  10:02:12  sloboda
-# removed minor bug
-#
-# Revision 1.6  1995/05/16  12:47:20  sloboda
-# new option -d which duplicates and renames a line matching the given reg-exp.
-# all substitutions are then applied to the new renamed line only.
-#
-# Revision 1.5  1995/03/04  18:17:14  sloboda
-# replacements may only affect lines matching a regular expression (see option '-m')
-# removed minor bug: permissions of output files are as of the orignial files
-# added acouple of error messages
-#
-# Revision 1.4  1995/01/11  17:14:15  sloboda
-# comments (lines starting with ; or with #) and empty lines are now
-# ignored when reading in the substitution list.
-#
-# Revision 1.3  1994/12/02  02:31:12  sloboda
-# fixed serious bug -- the last char in the last line of a file was chopped off
-# if the file wasn't terminated by a newline character...
-#
-# Revision 1.2  1994/11/27  17:16:21  sloboda
-# Added some sanity checks: non-plain files (such as named pipes, sockets, directories)
-# and non-writable files and files with size zero will be ommitted from the file list!
-#
-# Revision 1.1  1994/11/20  05:10:02  sloboda
-# removed minor bug
-#
-# Revision 1.0  1994/11/20  01:13:31  sloboda
-# this revision can handle multiples search/replace rules
-# for each line in each file.
-#
-# Revision 0.3  1994/11/20  01:07:15  sloboda
-# this was the first version which was released.
-# it could handle only one substitution for each line.
-#
 ####################################################################################################
-## require "flush.pl";
-
-$revision        = '$Revision: 1.10 $';
-$revision        =~ tr/$//d;
-$revision        =~ s/Revision: (\d+.\d+)/$1/;
-
 
 $iamroot    = ($> == 0);        # is the script run by root?
 $do_query   = 1;
@@ -104,7 +48,7 @@ $paragraph_mode = 0;
 $old_format = 0;
 $delete_empty_lines = 0;        # delete lines which get replaced to nothing?
 
-
+## require "flush.pl";
 sub flush {
     local($old) = select(shift);
     $| = 1;

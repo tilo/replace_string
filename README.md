@@ -1,5 +1,7 @@
 # Replace String
 
+If you want to make consistent changes in a large set of local files, this may be a useful and time-tested tool.
+
 **Command line tool to do Multiple search-replace or query-search-replace operations on multiple files.**
 
 This Perl script has been used extensively in production environments, is very powerful...
